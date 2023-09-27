@@ -333,7 +333,7 @@ class XLSXWriter
 		$file->write(		'<numFmt formatCode="#,##0.00" numFmtId="168"/>');
 		$file->write(		'<numFmt formatCode="0.0000" numFmtId="169"/>');
 		$file->write('</numFmts>');
-		$file->write('<fonts count="'. 5 + count($this->fonts) . '">');
+		$file->write('<fonts count="'. (5 + count($this->fonts)) . '">');
 		$file->write(		'<font><name val="Arial"/><charset val="1"/><family val="2"/><sz val="10"/></font>');
 		$file->write(		'<font><name val="Arial"/><family val="0"/><sz val="10"/></font>');
 		$file->write(		'<font><name val="Arial"/><family val="0"/><sz val="10"/></font>');
@@ -343,7 +343,7 @@ class XLSXWriter
 			$file->write(		'<font><name val="Arial"/><b val="'. ($bold ? 'true' : 'false') . '"/><charset val="1"/><family val="2"/><sz val="10"/><color rgb="'. $color . '"/></font>');
 		}
 		$file->write('</fonts>');
-		$file->write('<fills count="'. 3 + count($this->fills) .'">');
+		$file->write('<fills count="'. (3 + count($this->fills)) .'">');
 		$file->write('		<fill><patternFill patternType="none"/></fill>');
 		$file->write('		<fill><patternFill patternType="gray125"/></fill>');
 		$file->write('		<fill><patternFill patternType="solid"><fgColor theme="0" tint="-0.249977111117893"/><bgColor rgb="FF003300"/></patternFill></fill>');
@@ -377,7 +377,7 @@ class XLSXWriter
 		$file->write(		'<xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="1" numFmtId="42"/>');
 		$file->write(		'<xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="1" numFmtId="9"/>');
 		$file->write(	'</cellStyleXfs>');
-		$file->write(	'<cellXfs count="'. 7 + count($this->styles) . '">');
+		$file->write(	'<cellXfs count="'. (7 + count($this->styles)) . '">');
 		$file->write(		'<xf applyAlignment="false" applyBorder="false" applyFont="false" applyProtection="false" borderId="0" fillId="0" fontId="0" numFmtId="164" xfId="0"/>');
 		$file->write(		'<xf applyAlignment="false" applyBorder="false" applyFont="false" applyProtection="false" borderId="0" fillId="0" fontId="0" numFmtId="165" xfId="0"/>');
 		$file->write(		'<xf applyAlignment="false" applyBorder="false" applyFont="false" applyProtection="false" borderId="0" fillId="0" fontId="0" numFmtId="166" xfId="0"/>');
