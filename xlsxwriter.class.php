@@ -20,6 +20,10 @@ class XLSXWriter
 
 	protected $current_sheet = '';
 
+	protected $fonts = [];
+	protected $fills = [];
+	protected $styles = [];
+
 	public function __construct()
 	{
 		if(!ini_get('date.timezone'))
@@ -30,6 +34,21 @@ class XLSXWriter
 	}
 
 	public function setAuthor($author='') { $this->author=$author; }
+
+	public function addStyle(string $name, string $font_color, string $background_color, bool $bold = false): void {
+		$this->fonts[] = [
+			$font_color,
+			$bold
+		];
+		$this->fills[] = [
+			$background_color
+		];
+		$this->styles[$name] = [
+			count($this->fonts) + 5,
+			count($this->fills) + 3,
+			7 + count($this->styles),
+		];
+	}
 
 	public function __destruct()
 	{
@@ -279,7 +298,7 @@ class XLSXWriter
 			'blackheader' => 6
 		);
 		$cell = self::xlsCell($row_number, $column_number);
-		$s = isset($styles[$cell_format]) ? $styles[$cell_format] : '0';
+		$s = $styles[$cell_format] ?? $this->styles[$cell_format][2] ?? '0';
 
 		if (!is_scalar($value) || $value==='') { //objects, array, empty
 			$file->write('<c r="'.$cell.'" s="'.$s.'"/>');
@@ -314,17 +333,23 @@ class XLSXWriter
 		$file->write(		'<numFmt formatCode="#,##0.00" numFmtId="168"/>');
 		$file->write(		'<numFmt formatCode="0.0000" numFmtId="169"/>');
 		$file->write('</numFmts>');
-		$file->write('<fonts count="5">');
+		$file->write('<fonts count="'. 5 + count($this->fonts) . '">');
 		$file->write(		'<font><name val="Arial"/><charset val="1"/><family val="2"/><sz val="10"/></font>');
 		$file->write(		'<font><name val="Arial"/><family val="0"/><sz val="10"/></font>');
 		$file->write(		'<font><name val="Arial"/><family val="0"/><sz val="10"/></font>');
 		$file->write(		'<font><name val="Arial"/><family val="0"/><sz val="10"/></font>');
 		$file->write(		'<font><name val="Arial"/><b val="true"/><charset val="1"/><family val="2"/><sz val="10"/></font>');
+		foreach($this->fonts as [$color, $bold]) {
+			$file->write(		'<font><name val="Arial"/><b val="'. ($bold ? 'true' : 'false') . '"/><charset val="1"/><family val="2"/><sz val="10"/><color rgb="'. $color . '"/></font>');
+		}
 		$file->write('</fonts>');
-		$file->write('<fills count="3">');
+		$file->write('<fills count="'. 3 + count($this->fills) .'">');
 		$file->write('		<fill><patternFill patternType="none"/></fill>');
 		$file->write('		<fill><patternFill patternType="gray125"/></fill>');
 		$file->write('		<fill><patternFill patternType="solid"><fgColor theme="0" tint="-0.249977111117893"/><bgColor rgb="FF003300"/></patternFill></fill>');
+		foreach($this->fills as [$color]) {
+			$file->write('		<fill><patternFill patternType="solid"><fgColor rgb="'. $color . '"/></patternFill></fill>');
+		}
 		$file->write('</fills>');
 		$file->write('<borders count="1"><border diagonalDown="false" diagonalUp="false"><left/><right/><top/><bottom/><diagonal/></border></borders>');
 		$file->write(	'<cellStyleXfs count="20">');
@@ -352,7 +377,7 @@ class XLSXWriter
 		$file->write(		'<xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="1" numFmtId="42"/>');
 		$file->write(		'<xf applyAlignment="false" applyBorder="false" applyFont="true" applyProtection="false" borderId="0" fillId="0" fontId="1" numFmtId="9"/>');
 		$file->write(	'</cellStyleXfs>');
-		$file->write(	'<cellXfs count="7">');
+		$file->write(	'<cellXfs count="'. 7 + count($this->styles) . '">');
 		$file->write(		'<xf applyAlignment="false" applyBorder="false" applyFont="false" applyProtection="false" borderId="0" fillId="0" fontId="0" numFmtId="164" xfId="0"/>');
 		$file->write(		'<xf applyAlignment="false" applyBorder="false" applyFont="false" applyProtection="false" borderId="0" fillId="0" fontId="0" numFmtId="165" xfId="0"/>');
 		$file->write(		'<xf applyAlignment="false" applyBorder="false" applyFont="false" applyProtection="false" borderId="0" fillId="0" fontId="0" numFmtId="166" xfId="0"/>');
@@ -360,6 +385,9 @@ class XLSXWriter
 		$file->write(		'<xf applyAlignment="false" applyBorder="false" applyFont="false" applyProtection="false" borderId="0" fillId="0" fontId="0" numFmtId="168" xfId="0"/>');
 		$file->write(		'<xf applyAlignment="false" applyBorder="false" applyFont="false" applyProtection="false" borderId="0" fillId="0" fontId="0" numFmtId="169" xfId="0"/>');
 		$file->write(		'<xf applyAlignment="false" applyBorder="false" applyFont="false" applyProtection="false" borderId="0" fillId="2" fontId="4" numFmtId="164" xfId="0"/>');
+		foreach($this->styles as [$font_id, $fill_id, $_]) {
+			$file->write(		'<xf applyAlignment="false" applyBorder="false" applyFont="false" applyProtection="false" borderId="0" fillId="'. ($fill_id - 1) . '" fontId="'. ($font_id - 1) .'" numFmtId="164" xfId="0"/>');
+		}
 		$file->write(	'</cellXfs>');
 		$file->write(	'<cellStyles count="6">');
 		$file->write(		'<cellStyle builtinId="0" customBuiltin="false" name="Normal" xfId="0"/>');
