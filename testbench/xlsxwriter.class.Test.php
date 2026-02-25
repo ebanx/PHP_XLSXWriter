@@ -77,6 +77,20 @@ class XLSXWriterTest extends \PHPUnit\Framework\TestCase
 		$this->assertEmpty($r2);
 	}
 
+	public function testCustomStyle()
+	{
+		$filename = tempnam("/tmp", "xlsx_writer");
+		$file_writer = new XLSXWriter_BuffererWriter($filename);
+
+        $xlsx_writer = new _XLSXWriter_();
+		$xlsx_writer->addStyle('test', 'FFFFFF', 'FFFFFF');
+        $xlsx_writer->writeCell($file_writer, 0, 0, '0123', 'test');
+        $file_writer->close();
+        $cell_xml = file_get_contents($filename);
+        $this->assertEquals('<c r="A1" s="7" t="s"><v>0</v></c>', $cell_xml);
+        @unlink($filename);
+    }
+
 	private function stripCellsFromSheetXML($sheet_xml)
 	{
 		$output=array();

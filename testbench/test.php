@@ -15,9 +15,12 @@ $data1 = array(
 $data2 = array(
     array('2003','01','343.12'),
     array('2003','02','345.12'),
+    array('2003','02', ['Vencedor', 'SaoPaulo'], ['Perdedor', 'Flamengo']),
 );
 $writer = new XLSXWriter();
 $writer->setAuthor('Some Author');
+$writer->addStyle('SaoPaulo', 'FFFFFF', 'FF0000', true);
+$writer->addStyle('Flamengo', 'FF0000', '000000', false);
 $writer->writeSheet($data1,'Sheet1',$header);
 $writer->writeSheet($data2,'Sheet2');
 $writer->writeToFile('test.xlsx');
